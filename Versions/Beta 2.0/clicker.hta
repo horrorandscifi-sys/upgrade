@@ -1,0 +1,133 @@
+<html>
+<head>
+<title>Clicker Game v2.3</title>
+<HTA:APPLICATION
+  ID="ClickerApp"
+  APPLICATIONNAME="ClickerGameV2.3"
+  BORDER="thin"
+  SCROLL="no"
+  SINGLEINSTANCE="yes"
+  WINDOWSTATE="normal"
+>
+<style>
+body { font-family: Arial; text-align: center; margin-top: 30px; }
+button { margin: 8px; padding: 10px 20px; font-size: 16px; }
+#info { margin-top: 20px; font-size: 18px; }
+#progress { width: 300px; height: 20px; border: 1px solid black; margin: 10px auto; }
+#bar { height: 100%; background: green; width: 0%; transition: width 0.5s; }
+</style>
+<script language="VBScript">
+Dim clicks, gold, autoEnabled, autoSpeed, multiplier, level
+
+clicks = 0
+gold = 0
+autoEnabled = False
+autoSpeed = 1000
+multiplier = 1
+level = 1
+
+Sub UpdateInfo()
+    document.getElementById("info").innerHTML = "Clicks: " & clicks & _
+        "<br>Gold: " & gold & _
+        "<br>Multiplier: x" & multiplier & _
+        "<br>Level: " & level & _
+        "<br>AutoClicker: " & (IIf(autoEnabled, "ON", "OFF"))
+    UpdateProgress()
+End Sub
+
+Sub UpdateProgress()
+    Dim percent
+    percent = (clicks Mod 100)
+    document.getElementById("bar").style.width = percent & "%"
+    If clicks >= (level * 100) Then
+        level = level + 1
+        gold = gold + 5
+        MsgBox "Level Up! Now level " & level & " (+5 gold)"
+    End If
+End Sub
+
+Sub DoClick()
+    clicks = clicks + (1 * multiplier)
+    CheckAchievements()
+    UpdateInfo()
+End Sub
+
+Sub ToggleAuto()
+    autoEnabled = Not autoEnabled
+    If autoEnabled Then AutoLoop()
+    UpdateInfo()
+End Sub
+
+Sub AutoLoop()
+    If autoEnabled = True Then
+        clicks = clicks + (1 * multiplier)
+        CheckAchievements()
+        UpdateInfo()
+        window.setTimeout "AutoLoop()", autoSpeed
+    End If
+End Sub
+
+Sub BuyMultiplier()
+    If clicks >= 50 Then
+        clicks = clicks - 50
+        multiplier = multiplier * 2
+        MsgBox "Multiplier upgraded! Now x" & multiplier
+    Else
+        MsgBox "Not enough clicks!"
+    End If
+    UpdateInfo()
+End Sub
+
+Sub BuyGoldenMultiplier()
+    If gold >= 10 Then
+        gold = gold - 10
+        multiplier = multiplier * 3
+        MsgBox "Golden Multiplier! Now x" & multiplier
+    Else
+        MsgBox "Not enough gold!"
+    End If
+    UpdateInfo()
+End Sub
+
+Sub BuyEnergyDrink()
+    If clicks >= 40 Then
+        clicks = clicks - 40
+        autoSpeed = autoSpeed / 2
+        MsgBox "Energy Drink! AutoClicker faster temporarily."
+        window.setTimeout "ResetSpeed()", 10000 ' через 10 секунд вернуть скорость
+    Else
+        MsgBox "Not enough clicks!"
+    End If
+    UpdateInfo()
+End Sub
+
+Sub ResetSpeed()
+    autoSpeed = 1000
+    UpdateInfo()
+End Sub
+
+Sub CheckAchievements()
+    If clicks = 10 Then MsgBox "Achievement unlocked: First Step!"
+    If clicks = 100 Then MsgBox "Achievement unlocked: Master Clicker!"
+    If clicks = 1000 Then MsgBox "Secret Achievement: Iron Finger!"
+End Sub
+
+Sub ExitGame()
+    MsgBox "Game Over! You finished with " & clicks & " clicks, " & gold & " gold. Level " & level
+    window.close()
+End Sub
+</script>
+</head>
+<body onload="UpdateInfo()">
+    <h1>Clicker Game v2.3</h1>
+    <button onclick="DoClick()">Click (+1)</button>
+    <button onclick="ToggleAuto()">Toggle Auto Clicker</button>
+    <button onclick="BuyMultiplier()">Buy Multiplier (50 clicks)</button>
+    <button onclick="BuyGoldenMultiplier()">Buy Golden Multiplier (10 gold)</button>
+    <button onclick="BuyEnergyDrink()">Buy Energy Drink (40 clicks)</button>
+    <br>
+    <button onclick="ExitGame()">Exit</button>
+    <div id="info"></div>
+    <div id="progress"><div id="bar"></div></div>
+</body>
+</html>

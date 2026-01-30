@@ -1,0 +1,62 @@
+<html>
+<head>
+<title>Clicker Game Version X</title>
+<HTA:APPLICATION
+  ID="ClickerApp"
+  APPLICATIONNAME="ClickerGameX"
+  BORDER="thin"
+  SCROLL="no"
+  SINGLEINSTANCE="yes"
+  WINDOWSTATE="normal"
+>
+<style>
+body { font-family: Arial; text-align: center; margin-top: 30px; }
+button { margin: 8px; padding: 10px 20px; font-size: 16px; }
+#info { margin-top: 20px; font-size: 18px; }
+</style>
+<script language="VBScript">
+Dim clicks, world, multiplier
+
+clicks = 0
+world = "Robots"
+multiplier = 1
+
+Sub UpdateInfo()
+    document.getElementById("info").innerHTML = "World: " & world & _
+        "<br>Clicks: " & clicks & _
+        "<br>Multiplier: x" & multiplier
+End Sub
+
+Sub DoClick()
+    clicks = clicks + (1 * multiplier)
+    If clicks = 100 Then MsgBox "Artifact unlocked: Ring of Infinite Click!"
+    If clicks = 9999 Then MsgBox "Chaos Mode unlocked!"
+    UpdateInfo()
+End Sub
+
+Sub ChangeWorld()
+    If world = "Robots" Then
+        world = "Magic"
+    ElseIf world = "Magic" Then
+        world = "Space"
+    Else
+        world = "Robots"
+    End If
+    MsgBox "World changed to " & world
+    UpdateInfo()
+End Sub
+
+Sub ExitGame()
+    MsgBox "Game Over! You finished with " & clicks & " clicks in world " & world
+    window.close()
+End Sub
+</script>
+</head>
+<body onload="UpdateInfo()">
+    <h1>Clicker Game Version X</h1>
+    <button onclick="DoClick()">Click (+1)</button>
+    <button onclick="ChangeWorld()">Change World</button>
+    <button onclick="ExitGame()">Exit</button>
+    <div id="info"></div>
+</body>
+</html>

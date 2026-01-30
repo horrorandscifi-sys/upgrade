@@ -1,0 +1,65 @@
+<html>
+<head>
+<title>Auto Clicker Game</title>
+<HTA:APPLICATION
+  ID="ClickerApp"
+  APPLICATIONNAME="AutoClickerGame"
+  BORDER="thin"
+  SCROLL="no"
+  SINGLEINSTANCE="yes"
+  WINDOWSTATE="normal"
+>
+<style>
+body { font-family: Arial; text-align: center; margin-top: 50px; }
+button { margin: 10px; padding: 10px 20px; font-size: 16px; }
+#info { margin-top: 20px; font-size: 18px; }
+</style>
+<script language="VBScript">
+Dim clicks, autoEnabled
+clicks = 0
+autoEnabled = False
+
+Sub UpdateInfo()
+    document.getElementById("info").innerHTML = "Clicks: " & clicks
+End Sub
+
+Sub DoClick()
+    clicks = clicks + 1
+    UpdateInfo()
+End Sub
+
+Sub ToggleAuto()
+    If autoEnabled = False Then
+        autoEnabled = True
+        MsgBox "Auto clicker ON"
+        Call AutoLoop()
+    Else
+        autoEnabled = False
+        MsgBox "Auto clicker OFF"
+    End If
+End Sub
+
+Sub AutoLoop()
+    If autoEnabled = True Then
+        clicks = clicks + 1
+        UpdateInfo()
+        ' Запускаем снова через 1 секунду
+        window.setTimeout "AutoLoop()", 1000
+    End If
+End Sub
+
+Sub ExitGame()
+    MsgBox "Game Over! You finished with " & clicks & " clicks."
+    window.close()
+End Sub
+</script>
+</head>
+<body onload="UpdateInfo()">
+    <h1>Auto Clicker Game</h1>
+    <button onclick="DoClick()">Click (+1)</button>
+    <button onclick="ToggleAuto()">Toggle Auto Clicker</button>
+    <button onclick="ExitGame()">Exit</button>
+    <div id="info"></div>
+</body>
+</html>
+

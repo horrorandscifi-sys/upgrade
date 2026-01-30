@@ -1,0 +1,125 @@
+<html>
+<head>
+<title>Clicker Game v2.2</title>
+<HTA:APPLICATION
+  ID="ClickerApp"
+  APPLICATIONNAME="ClickerGameV2.2"
+  BORDER="thin"
+  SCROLL="no"
+  SINGLEINSTANCE="yes"
+  WINDOWSTATE="normal"
+>
+<style>
+body { font-family: Arial; text-align: center; margin-top: 30px; }
+button { margin: 8px; padding: 10px 20px; font-size: 16px; }
+#info { margin-top: 20px; font-size: 18px; }
+#progress { width: 300px; height: 20px; border: 1px solid black; margin: 10px auto; }
+#bar { height: 100%; background: green; width: 0%; }
+</style>
+<script language="VBScript">
+Dim clicks, autoEnabled, autoSpeed, multiplier, level
+
+clicks = 0
+autoEnabled = False
+autoSpeed = 1000
+multiplier = 1
+level = 1
+
+Sub UpdateInfo()
+    document.getElementById("info").innerHTML = "Clicks: " & clicks & _
+        "<br>Multiplier: x" & multiplier & _
+        "<br>Level: " & level & _
+        "<br>AutoClicker: " & (IIf(autoEnabled, "ON", "OFF"))
+    UpdateProgress()
+End Sub
+
+Sub UpdateProgress()
+    Dim percent
+    percent = (clicks Mod 100) ' каждые 100 кликов — новый уровень
+    document.getElementById("bar").style.width = percent & "%"
+    If clicks >= (level * 100) Then
+        level = level + 1
+        MsgBox "Level Up! Now level " & level
+    End If
+End Sub
+
+Sub DoClick()
+    clicks = clicks + (1 * multiplier)
+    CheckAchievements()
+    UpdateInfo()
+End Sub
+
+Sub ToggleAuto()
+    autoEnabled = Not autoEnabled
+    If autoEnabled Then AutoLoop()
+    UpdateInfo()
+End Sub
+
+Sub AutoLoop()
+    If autoEnabled = True Then
+        clicks = clicks + (1 * multiplier)
+        CheckAchievements()
+        UpdateInfo()
+        window.setTimeout "AutoLoop()", autoSpeed
+    End If
+End Sub
+
+Sub BuyMultiplier()
+    If clicks >= 50 Then
+        clicks = clicks - 50
+        multiplier = multiplier * 2
+        MsgBox "Multiplier upgraded! Now x" & multiplier
+    Else
+        MsgBox "Not enough clicks!"
+    End If
+    UpdateInfo()
+End Sub
+
+Sub BuyTurbo()
+    If clicks >= 20 Then
+        clicks = clicks - 20
+        clicks = clicks + 10
+        MsgBox "Turbo Click! +10 clicks"
+    Else
+        MsgBox "Not enough clicks!"
+    End If
+    UpdateInfo()
+End Sub
+
+Sub BuyLuck()
+    If clicks >= 30 Then
+        clicks = clicks - 30
+        Dim bonus
+        bonus = Int((50 * Rnd) + 1) ' случайный бонус от 1 до 50
+        clicks = clicks + bonus
+        MsgBox "Lucky Bonus! +" & bonus & " clicks"
+    Else
+        MsgBox "Not enough clicks!"
+    End If
+    UpdateInfo()
+End Sub
+
+Sub CheckAchievements()
+    If clicks = 10 Then MsgBox "Achievement unlocked: First Step!"
+    If clicks = 100 Then MsgBox "Achievement unlocked: Master Clicker!"
+End Sub
+
+Sub ExitGame()
+    MsgBox "Game Over! You finished with " & clicks & " clicks. Level " & level
+    window.close()
+End Sub
+</script>
+</head>
+<body onload="UpdateInfo()">
+    <h1>Clicker Game v2.2</h1>
+    <button onclick="DoClick()">Click (+1)</button>
+    <button onclick="ToggleAuto()">Toggle Auto Clicker</button>
+    <button onclick="BuyMultiplier()">Buy Multiplier (50)</button>
+    <button onclick="BuyTurbo()">Buy Turbo Click (20)</button>
+    <button onclick="BuyLuck()">Buy Lucky Bonus (30)</button>
+    <br>
+    <button onclick="ExitGame()">Exit</button>
+    <div id="info"></div>
+    <div id="progress"><div id="bar"></div></div>
+</body>
+</html>

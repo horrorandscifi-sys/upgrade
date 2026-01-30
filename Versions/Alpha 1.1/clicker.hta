@@ -1,0 +1,121 @@
+<html>
+<head>
+<title>Clicker Game v1.1</title>
+<HTA:APPLICATION
+  ID="ClickerApp"
+  APPLICATIONNAME="ClickerGameV1.1"
+  BORDER="thin"
+  SCROLL="no"
+  SINGLEINSTANCE="yes"
+  WINDOWSTATE="normal"
+>
+<style>
+body { font-family: Arial; text-align: center; margin-top: 30px; }
+button { margin: 8px; padding: 10px 20px; font-size: 16px; }
+#info { margin-top: 20px; font-size: 18px; }
+</style>
+<script language="VBScript">
+Dim clicks, autoEnabled, autoSpeed, multiplier
+
+clicks = 0
+autoEnabled = False
+autoSpeed = 1000 ' миллисекунд (1 секунда)
+multiplier = 1
+
+Sub UpdateInfo()
+    document.getElementById("info").innerHTML = "Clicks: " & clicks & _
+        "<br>Multiplier: x" & multiplier & _
+        "<br>AutoClicker: " & (IIf(autoEnabled, "ON", "OFF"))
+End Sub
+
+Sub DoClick()
+    clicks = clicks + (1 * multiplier)
+    UpdateInfo()
+End Sub
+
+Sub ToggleAuto()
+    If autoEnabled = False Then
+        autoEnabled = True
+        AutoLoop()
+    Else
+        autoEnabled = False
+    End If
+    UpdateInfo()
+End Sub
+
+Sub AutoLoop()
+    If autoEnabled = True Then
+        clicks = clicks + (1 * multiplier)
+        UpdateInfo()
+        window.setTimeout "AutoLoop()", autoSpeed
+    End If
+End Sub
+
+Sub BuyMultiplier()
+    If clicks >= 50 Then
+        clicks = clicks - 50
+        multiplier = multiplier * 2
+        MsgBox "Multiplier upgraded! Now x" & multiplier
+    Else
+        MsgBox "Not enough clicks!"
+    End If
+    UpdateInfo()
+End Sub
+
+Sub UpgradeAuto()
+    If clicks >= 30 Then
+        clicks = clicks - 30
+        autoSpeed = autoSpeed / 2
+        MsgBox "AutoClicker upgraded! Faster speed."
+    Else
+        MsgBox "Not enough clicks!"
+    End If
+    UpdateInfo()
+End Sub
+
+Sub SaveGame()
+    Dim fso, file
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set file = fso.CreateTextFile("save.txt", True)
+    file.WriteLine clicks
+    file.WriteLine multiplier
+    file.WriteLine autoSpeed
+    file.Close
+    MsgBox "Game saved!"
+End Sub
+
+Sub LoadGame()
+    Dim fso, file, lines
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    If fso.FileExists("save.txt") Then
+        Set file = fso.OpenTextFile("save.txt", 1)
+        clicks = CLng(file.ReadLine)
+        multiplier = CLng(file.ReadLine)
+        autoSpeed = CLng(file.ReadLine)
+        file.Close
+        MsgBox "Game loaded!"
+    Else
+        MsgBox "No save file found."
+    End If
+    UpdateInfo()
+End Sub
+
+Sub ExitGame()
+    MsgBox "Game Over! You finished with " & clicks & " clicks."
+    window.close()
+End Sub
+</script>
+</head>
+<body onload="UpdateInfo()">
+    <h1>Clicker Game v1.1</h1>
+    <button onclick="DoClick()">Click (+1)</button>
+    <button onclick="ToggleAuto()">Toggle Auto Clicker</button>
+    <button onclick="BuyMultiplier()">Buy Multiplier (50)</button>
+    <button onclick="UpgradeAuto()">Upgrade AutoClicker (30)</button>
+    <br>
+    <button onclick="SaveGame()">Save</button>
+    <button onclick="LoadGame()">Load</button>
+    <button onclick="ExitGame()">Exit</button>
+    <div id="info"></div>
+</body>
+</html>

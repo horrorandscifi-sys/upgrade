@@ -1,0 +1,138 @@
+<html>
+<head>
+<title>Clicker Game v2.4</title>
+<HTA:APPLICATION
+  ID="ClickerApp"
+  APPLICATIONNAME="ClickerGameV2.4"
+  BORDER="thin"
+  SCROLL="no"
+  SINGLEINSTANCE="yes"
+  WINDOWSTATE="normal"
+>
+<style>
+body { font-family: Arial; text-align: center; margin-top: 30px; }
+button { margin: 8px; padding: 10px 20px; font-size: 16px; }
+#info { margin-top: 20px; font-size: 18px; }
+#progress { width: 300px; height: 20px; border: 1px solid black; margin: 10px auto; }
+#bar { height: 100%; background: green; width: 0%; transition: width 0.5s; }
+</style>
+<script language="VBScript">
+Dim clicks, gold, energy, autoEnabled, autoSpeed, multiplier, level
+
+clicks = 0
+gold = 0
+energy = 100
+autoEnabled = False
+autoSpeed = 1000
+multiplier = 1
+level = 1
+
+Sub UpdateInfo()
+    document.getElementById("info").innerHTML = "Clicks: " & clicks & _
+        "<br>Gold: " & gold & _
+        "<br>Energy: " & energy & _
+        "<br>Multiplier: x" & multiplier & _
+        "<br>Level: " & level & _
+        "<br>AutoClicker: " & (IIf(autoEnabled, "ON", "OFF"))
+    UpdateProgress()
+End Sub
+
+Sub UpdateProgress()
+    Dim percent
+    percent = (clicks Mod 100)
+    document.getElementById("bar").style.width = percent & "%"
+    If clicks >= (level * 100) Then
+        level = level + 1
+        gold = gold + 5
+        MsgBox "Level Up! Now level " & level & " (+5 gold)"
+    End If
+End Sub
+
+Sub DoClick()
+    If energy > 0 Then
+        clicks = clicks + (1 * multiplier)
+        energy = energy - 1
+        CheckAchievements()
+    Else
+        MsgBox "Not enough energy!"
+    End If
+    UpdateInfo()
+End Sub
+
+Sub RestoreEnergy()
+    energy = energy + 10
+    If energy > 100 Then energy = 100
+    UpdateInfo()
+End Sub
+
+Sub ToggleAuto()
+    autoEnabled = Not autoEnabled
+    If autoEnabled Then AutoLoop()
+    UpdateInfo()
+End Sub
+
+Sub AutoLoop()
+    If autoEnabled = True Then
+        If energy > 0 Then
+            clicks = clicks + (1 * multiplier)
+            energy = energy - 1
+        End If
+        CheckAchievements()
+        UpdateInfo()
+        window.setTimeout "AutoLoop()", autoSpeed
+    End If
+End Sub
+
+Sub BuyEnergyGen()
+    If gold >= 10 Then
+        gold = gold - 10
+        energy = energy + 20
+        If energy > 100 Then energy = 100
+        MsgBox "Energy Generator bought! +20 energy"
+    Else
+        MsgBox "Not enough gold!"
+    End If
+    UpdateInfo()
+End Sub
+
+Sub BuyGoldenHand()
+    If clicks >= 50 Then
+        clicks = clicks - 50
+        gold = gold + 10
+        MsgBox "Golden Hand! +10 gold"
+    Else
+        MsgBox "Not enough clicks!"
+    End If
+    UpdateInfo()
+End Sub
+
+Sub CheckAchievements()
+    If clicks = 10 Then MsgBox "Achievement unlocked: First Step!"
+    If clicks = 100 Then MsgBox "Achievement unlocked: Master Clicker!"
+    If clicks = 1000 Then MsgBox "Secret Achievement: Iron Finger!"
+End Sub
+
+Sub ExitGame()
+    MsgBox "Game Over! You finished with " & clicks & " clicks, " & gold & " gold, " & energy & " energy. Level " & level
+    window.close()
+End Sub
+
+' Автоматическое восстановление энергии каждые 5 секунд
+Sub EnergyLoop()
+    RestoreEnergy()
+    window.setTimeout "EnergyLoop()", 5000
+End Sub
+</script>
+</head>
+<body onload="UpdateInfo(), EnergyLoop()">
+    <h1>Clicker Game v2.4</h1>
+    <button onclick="DoClick()">Click (+1)</button>
+    <button onclick="ToggleAuto()">Toggle Auto Clicker</button>
+    <button onclick="BuyEnergyGen()">Buy Energy Generator (10 gold)</button>
+    <button onclick="BuyGoldenHand()">Buy Golden Hand (50 clicks)</button>
+    <br>
+    <button onclick="ExitGame()">Exit</button>
+    <div id="info"></div>
+    <div id="progress"><div id="bar"></div></div>
+</body>
+</html>
